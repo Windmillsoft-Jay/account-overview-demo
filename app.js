@@ -15,7 +15,7 @@ const groups = {
       { id: "kb", name: "국민은행", mark: "KB", color: "#a69161", accounts: [
         { product: "KB Wise통장", number: "05100104*****1", balance: 1, canClose: true },
         { product: "KB나라사랑우대통장", number: "93350200*****2", balance: 0, canClose: false },
-        { product: "KB종합통장", number: "0025300*****9", balance: 1000, canClose: false }
+        { product: "KB청년도약계좌", number: "0025300*****9", balance: 701000, canClose: false }
       ]},
       { id: "im", name: "iM뱅크(구 대구은행)", mark: "iM", color: "#18cbb7", accounts: [
         { product: "저축예금(iM스마트통장)", number: "508149*****0", balance: 0, canClose: true }
