@@ -1,9 +1,9 @@
-const CACHE = "account-overview-demo-v8";
+const CACHE = "account-overview-demo-v9";
 const ASSETS = [
   "./index.html",
-  "./styles.css?v=8",
-  "./app.js?v=8",
-  "./manifest.webmanifest?v=8",
+  "./styles.css?v=9",
+  "./app.js?v=9",
+  "./manifest.webmanifest?v=9",
   "./icon.svg",
   "./icon-192.png",
   "./icon-512.png"
