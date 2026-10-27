@@ -61,40 +61,56 @@
 
               <!-- 3×2 서비스 그리드 -->
               <div class="service-grid">
-                <!-- 내 계좌 한눈에: 보라 복주머니 + 별 -->
+                <!-- 내 계좌 한눈에: 보라 복주머니 + 황금별 -->
                 <button type="button" class="service-item" data-action="accounts" aria-label="내 계좌 한눈에">
                   <span class="service-icon accounts-icon" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M8 13C8 10.2 9.8 9 12 9H16C18.2 9 20 10.2 20 13V21C20 22.7 18.7 23 17 23H11C9.3 23 8 22.7 8 21Z" fill="#7B5EF5"/>
-                      <path d="M12 9V7C12 5.9 12.9 5 14 5C15.1 5 16 5.9 16 7V9" stroke="#5B3DC8" stroke-width="2" fill="none" stroke-linecap="round"/>
-                      <ellipse cx="14" cy="9.2" rx="2.2" ry="1.1" fill="#6649E0"/>
-                      <path d="M14 13.5L15.1 16.4H18.2L15.7 18.1L16.7 21L14 19.3L11.3 21L12.3 18.1L9.8 16.4H12.9Z" fill="white" opacity="0.95"/>
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <!-- 복주머니 몸통 -->
+                      <path d="M5 19C5 13.5 8.5 10.5 15 10.5C21.5 10.5 25 13.5 25 19C25 23.8 21 27 15 27C9 27 5 23.8 5 19Z" fill="#7C55F5"/>
+                      <!-- 광택 하이라이트 -->
+                      <ellipse cx="11" cy="14.5" rx="4.5" ry="3" fill="white" opacity="0.18" transform="rotate(-20 11 14.5)"/>
+                      <!-- 주머니 목 -->
+                      <path d="M11 11C11 9.5 12.5 9 15 9C17.5 9 19 9.5 19 11" fill="#6040D0"/>
+                      <path d="M11 11C11 9.5 12.5 9 15 9C17.5 9 19 9.5 19 11" stroke="#5530B8" stroke-width="1.5" fill="none"/>
+                      <!-- 끈/매듭 -->
+                      <path d="M13 9C12.5 6.5 13 4.5 15 4C17 4 17.5 6 17 9" stroke="#4A28A0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                      <ellipse cx="15" cy="9.2" rx="2.2" ry="1.4" fill="#5535C0"/>
+                      <!-- 황금별 (5각형) -->
+                      <path d="M15 14L16.47 16.98L19.76 17.45L17.38 19.77L17.94 23.05L15 21.5L12.06 23.05L12.62 19.77L10.24 17.45L13.53 16.98Z" fill="#FFD700"/>
+                      <!-- 별 하이라이트 -->
+                      <path d="M15 14L16.47 16.98L13.53 16.98Z" fill="#FFE852" opacity="0.7"/>
                     </svg>
                   </span>
                   <span class="service-label">내 계좌<br>한눈에</span>
                 </button>
-                <!-- 내 카드 한눈에: 파란 카드 -->
+                <!-- 내 카드 한눈에: 파란 신용카드 -->
                 <button type="button" class="service-item inert-control" aria-label="내 카드 한눈에">
                   <span class="service-icon cards-icon" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="4" y="8" width="20" height="13" rx="3" fill="#4B7BF5"/>
-                      <rect x="4" y="12" width="20" height="4" fill="#3560D4"/>
-                      <rect x="7" y="9.5" width="5" height="3.5" rx="1" fill="#7BA8FF"/>
-                      <rect x="7" y="17" width="6" height="1.5" rx="0.75" fill="white" opacity="0.7"/>
-                      <rect x="15" y="17" width="3" height="1.5" rx="0.75" fill="white" opacity="0.7"/>
-                      <rect x="19" y="17" width="3" height="1.5" rx="0.75" fill="white" opacity="0.7"/>
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="3" y="8" width="24" height="15" rx="3.5" fill="#3A7BF5"/>
+                      <rect x="3" y="13" width="24" height="4.5" fill="#1F56CC"/>
+                      <rect x="6.5" y="9.5" width="6" height="4" rx="1.2" fill="#7BAAFF"/>
+                      <rect x="6.5" y="18.5" width="7" height="1.8" rx="0.9" fill="white" opacity="0.6"/>
+                      <rect x="16" y="18.5" width="4" height="1.8" rx="0.9" fill="white" opacity="0.5"/>
+                      <rect x="21.5" y="18.5" width="4" height="1.8" rx="0.9" fill="white" opacity="0.5"/>
                     </svg>
                   </span>
                   <span class="service-label">내 카드<br>한눈에</span>
                 </button>
-                <!-- 내 자동이체 한눈에: 초록 지폐 뭉치 -->
+                <!-- 내 자동이체 한눈에: 초록 지폐 3장 겹침 -->
                 <button type="button" class="service-item inert-control" aria-label="내 자동이체 한눈에">
                   <span class="service-icon auto-icon" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="3" y="9" width="20" height="12" rx="2" fill="#A5D6A7" transform="rotate(-7 13 15)"/>
-                      <rect x="3.5" y="9.5" width="20" height="12" rx="2" fill="#69BB6E" transform="rotate(-3 13 15)"/>
-                      <rect x="4" y="10" width="20" height="12" rx="2" fill="#2FA558"/>
-                      <text x="14" y="18.5" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial,sans-serif">₩</text>
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <!-- 뒤 지폐 (연한 초록, 기울어짐) -->
+                      <rect x="2" y="7" width="23" height="14" rx="2.5" fill="#A5D6A7" transform="rotate(-8 13 14)"/>
+                      <!-- 중간 지폐 -->
+                      <rect x="2.5" y="8" width="23" height="13.5" rx="2.5" fill="#66BB6A" transform="rotate(-3 14 14)"/>
+                      <!-- 앞 지폐 -->
+                      <rect x="3" y="9" width="23" height="13" rx="2.5" fill="#2E7D32"/>
+                      <!-- 타원형 테두리 -->
+                      <ellipse cx="15" cy="15.5" rx="5.5" ry="3.8" stroke="#43A047" stroke-width="1.5" fill="none"/>
+                      <!-- ₩ 기호 -->
+                      <text x="15" y="18.5" text-anchor="middle" fill="#81C784" font-size="8.5" font-weight="bold" font-family="Arial,sans-serif">₩</text>
                     </svg>
                   </span>
                   <span class="service-label">내 자동이체<br>한눈에</span>
@@ -102,44 +118,58 @@
                 <!-- 세금/공과금 납부: 파란 영수증 문서 -->
                 <button type="button" class="service-item inert-control" aria-label="세금/공과금 납부">
                   <span class="service-icon tax-icon" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="6" y="4" width="16" height="19" rx="2" fill="#4B7BF5"/>
-                      <rect x="6" y="4" width="16" height="6" rx="2" fill="#3560D4"/>
-                      <rect x="6" y="8" width="16" height="2" fill="#3560D4"/>
-                      <rect x="9" y="13" width="10" height="1.5" rx="0.75" fill="white" opacity="0.9"/>
-                      <rect x="9" y="16" width="10" height="1.5" rx="0.75" fill="white" opacity="0.9"/>
-                      <rect x="9" y="19" width="6" height="1.5" rx="0.75" fill="white" opacity="0.6"/>
-                      <path d="M6 23 L7.2 22 L8.4 23 L9.6 22 L10.8 23 L12 22 L13.2 23 L14.4 22 L15.6 23 L16.8 22 L18 23 L19.2 22 L20.4 23 L21.6 22 L22 22.3 L22 24 L6 24 Z" fill="#3560D4"/>
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <!-- 영수증 본체 -->
+                      <rect x="5" y="3" width="20" height="23" rx="2.5" fill="#4B7BF5"/>
+                      <!-- 헤더 밴드 -->
+                      <rect x="5" y="3" width="20" height="7.5" rx="2.5" fill="#2D5CCC"/>
+                      <rect x="5" y="9" width="20" height="1.5" fill="#2D5CCC"/>
+                      <!-- 텍스트 줄 -->
+                      <rect x="8.5" y="13.5" width="13" height="2" rx="1" fill="white" opacity="0.9"/>
+                      <rect x="8.5" y="17.5" width="13" height="2" rx="1" fill="white" opacity="0.9"/>
+                      <rect x="8.5" y="21.5" width="8" height="2" rx="1" fill="white" opacity="0.6"/>
+                      <!-- 하단 지그재그 (영수증 절취선) -->
+                      <path d="M5 26L6.5 24.5L8 26L9.5 24.5L11 26L12.5 24.5L14 26L15.5 24.5L17 26L18.5 24.5L20 26L21.5 24.5L23 26L25 26L25 27L5 27Z" fill="#2D5CCC"/>
                     </svg>
                   </span>
                   <span class="service-label">세금/공과금<br>납부</span>
                 </button>
-                <!-- 카드 포인트 현금화: 오렌지 카드+P -->
+                <!-- 카드 포인트 현금화: 오렌지 WP 로고 -->
                 <button type="button" class="service-item inert-control" aria-label="카드 포인트 현금화">
                   <span class="service-icon points-icon" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="14" cy="14" r="11" fill="#FF9800"/>
-                      <circle cx="14" cy="14" r="11" fill="url(#wpgrad)" opacity="0.15"/>
-                      <text x="10" y="19" fill="white" font-size="13" font-weight="900" font-family="Arial,sans-serif">W</text>
-                      <text x="19" y="12" fill="#FFF176" font-size="8" font-weight="700" font-family="Arial,sans-serif">P</text>
-                      <defs>
-                        <radialGradient id="wpgrad" cx="30%" cy="30%">
-                          <stop offset="0%" stop-color="white"/>
-                          <stop offset="100%" stop-color="transparent"/>
-                        </radialGradient>
-                      </defs>
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <!-- 오렌지 원형 배경 -->
+                      <circle cx="15" cy="15" r="13" fill="#FF9800"/>
+                      <!-- 상단 하이라이트 -->
+                      <ellipse cx="11" cy="9" rx="5" ry="3" fill="white" opacity="0.15"/>
+                      <!-- W 글자 (큰, 흰색) -->
+                      <path d="M5 9L8 21L11.5 13L15 21L18 9" stroke="white" stroke-width="2.8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+                      <!-- P 서클 (작은, 우상단) -->
+                      <circle cx="23" cy="9" r="5.5" fill="#E65100"/>
+                      <path d="M21 6.5L21 11.5M21 6.5C21 6.5 25 6.5 25 9C25 11.5 21 11.5 21 11.5" stroke="white" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
                     </svg>
                   </span>
                   <span class="service-label">카드 포인트<br>현금화</span>
                 </button>
-                <!-- 내 대출 한눈에: 컬러 도넛 차트 -->
+                <!-- 내 대출 한눈에: 멀티컬러 도넛 차트 -->
                 <button type="button" class="service-item" data-action="loans" aria-label="내 대출 한눈에">
                   <span class="service-icon loans-icon" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="14" cy="14" r="9" stroke="#FF5722" stroke-width="5.5" fill="none" stroke-dasharray="24 32.5" transform="rotate(-90 14 14)"/>
-                      <circle cx="14" cy="14" r="9" stroke="#FFC107" stroke-width="5.5" fill="none" stroke-dasharray="14 42.5" transform="rotate(62 14 14)"/>
-                      <circle cx="14" cy="14" r="9" stroke="#26C6DA" stroke-width="5.5" fill="none" stroke-dasharray="10 46.5" transform="rotate(152 14 14)"/>
-                      <circle cx="14" cy="14" r="5.5" fill="white"/>
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <!-- r=11, 둘레=69.12 -->
+                      <!-- 주황-빨강 (45% = 31.1) : -90°부터 시작 -->
+                      <circle cx="15" cy="15" r="11" stroke="#FF5722" stroke-width="6.5" fill="none"
+                        stroke-dasharray="31.1 38.0" transform="rotate(-90 15 15)"/>
+                      <!-- 노랑 (27% = 18.7) : 72°부터 시작 (31.1/69.12*360 - 90 = 162-90=72) -->
+                      <circle cx="15" cy="15" r="11" stroke="#FFC107" stroke-width="6.5" fill="none"
+                        stroke-dasharray="18.7 50.4" transform="rotate(72 15 15)"/>
+                      <!-- 청록 (18% = 12.4) : 169°부터 시작 (72 + 18.7/69.12*360 = 72+97=169) -->
+                      <circle cx="15" cy="15" r="11" stroke="#26C6DA" stroke-width="6.5" fill="none"
+                        stroke-dasharray="12.4 56.7" transform="rotate(169 15 15)"/>
+                      <!-- 연두 (10% = 6.9) : 233°부터 시작 (169 + 12.4/69.12*360 = 169+64=233) -->
+                      <circle cx="15" cy="15" r="11" stroke="#81C784" stroke-width="6.5" fill="none"
+                        stroke-dasharray="6.9 62.2" transform="rotate(233 15 15)"/>
+                      <!-- 흰 중앙 원 -->
+                      <circle cx="15" cy="15" r="7" fill="white"/>
                     </svg>
                   </span>
                   <span class="service-label">내 대출<br>한눈에</span>
