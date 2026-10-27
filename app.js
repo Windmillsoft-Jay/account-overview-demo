@@ -88,22 +88,7 @@ const groups = {
   }
 };
 
-const loanContracts = [
-  { type: "예적금담보대출", institution: "국민은행[스타뱅킹영업부(PI)]", amount: 600000 },
-  { type: "기타담보대출", institution: "신한은행[목동해누리(지)]", amount: 2464000 },
-  { type: "지급보증담보대출", institution: "광주은행[디지털센터]", amount: 2378000 },
-  { type: "지급보증담보대출", institution: "광주은행[디지털센터지점]", amount: 956000 },
-  { type: "기타담보대출", institution: "하나은행[디지털영업부]", amount: 4200000 },
-  { type: "신용대출", institution: "오케이저축은행[본점영업부]", amount: 3410000 },
-  { type: "지급보증담보대출", institution: "우리금융저축은행주식회사[서울센터지점]", amount: 2600000 },
-  { type: "신용대출", institution: "카카오뱅크[인터넷뱅킹]", amount: 5000000, isExample: true },
-  { type: "신용대출", institution: "케이뱅크[인터넷뱅킹]", amount: 8000000, isExample: true },
-  { type: "신용대출", institution: "우리은행[마이뱅킹]", amount: 9800000, isExample: true },
-  { type: "전세자금대출", institution: "NH농협은행[스마트금융센터]", amount: 7200000, isExample: true },
-  { type: "신용대출", institution: "씨티은행[인터넷뱅킹]", amount: 6989000, isExample: true },
-  { type: "신용대출", institution: "iM뱅크[디지털센터]", amount: 6600000, isExample: true },
-  { type: "주택담보대출", institution: "하나은행[강남중앙지점]", amount: 6500000, isExample: true },
-];
+const loanContracts = [];
 
 const state = {
   group: "bank",
