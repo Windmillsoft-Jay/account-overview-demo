@@ -88,11 +88,39 @@ const groups = {
   }
 };
 
-const state = { group: "bank", institution: null, securitiesNoticeSeen: false, overviewScrollTop: 0 };
+const loanContracts = [
+  { type: "예적금담보대출", institution: "국민은행[스타뱅킹영업부(PI)]", amount: 600000 },
+  { type: "기타담보대출", institution: "신한은행[목동해누리(지)]", amount: 2464000 },
+  { type: "지급보증담보대출", institution: "광주은행[디지털센터]", amount: 2378000 },
+  { type: "지급보증담보대출", institution: "광주은행[디지털센터지점]", amount: 956000 },
+  { type: "기타담보대출", institution: "하나은행[디지털영업부]", amount: 4200000 },
+  { type: "신용대출", institution: "오케이저축은행[본점영업부]", amount: 3410000 },
+  { type: "지급보증담보대출", institution: "우리금융저축은행주식회사[서울센터지점]", amount: 2600000 },
+  { type: "신용대출", institution: "카카오뱅크[인터넷뱅킹]", amount: 5000000, isExample: true },
+  { type: "신용대출", institution: "케이뱅크[인터넷뱅킹]", amount: 8000000, isExample: true },
+  { type: "신용대출", institution: "우리은행[마이뱅킹]", amount: 9800000, isExample: true },
+  { type: "전세자금대출", institution: "NH농협은행[스마트금융센터]", amount: 7200000, isExample: true },
+  { type: "신용대출", institution: "씨티은행[인터넷뱅킹]", amount: 6989000, isExample: true },
+  { type: "신용대출", institution: "iM뱅크[디지털센터]", amount: 6600000, isExample: true },
+  { type: "주택담보대출", institution: "하나은행[강남중앙지점]", amount: 6500000, isExample: true },
+];
+
+const state = {
+  group: "bank",
+  institution: null,
+  securitiesNoticeSeen: false,
+  overviewScrollTop: 0,
+  screen: "home"  // "home" | "accounts" | "loan"
+};
+
+// DOM 참조
+const homeView = document.querySelector("#home-view");
 const overviewView = document.querySelector("#overview-view");
+const loanView = document.querySelector("#loan-view");
 const detailView = document.querySelector("#detail-view");
 const overviewScroll = document.querySelector("#overview-scroll");
 const detailScroll = document.querySelector("#detail-scroll");
+const loanScroll = document.querySelector("#loan-scroll");
 const institutionList = document.querySelector("#institution-list");
 const summaryPrefix = document.querySelector("#summary-prefix");
 const summaryCount = document.querySelector("#summary-count");
@@ -101,10 +129,12 @@ const detailContent = document.querySelector("#detail-content");
 const detailTotal = document.querySelector("#detail-total");
 const detailNotes = document.querySelector("#detail-notes");
 const loadingOverlay = document.querySelector("#loading-overlay");
+const loanLoadingOverlay = document.querySelector("#loan-loading-overlay");
 const securitiesModal = document.querySelector("#securities-modal");
 const bottomNav = document.querySelector(".bottom-nav");
 const toast = document.querySelector("#toast");
 let toastTimer;
+let loanLoadTimer;
 
 const formatWon = (value) => `${value.toLocaleString("ko-KR")} 원`;
 const totalOf = (institution) => institution.accounts.reduce((sum, account) => sum + account.balance, 0);
@@ -114,6 +144,17 @@ function logoTemplate(institution) {
   const wide = institution.wide ? " logo-wide" : "";
   const textColor = institution.textColor || "#fff";
   return `<span class="bank-logo${wide}" style="--logo-bg:${institution.color};color:${textColor}">${institution.mark}</span>`;
+}
+
+function updateBottomNav(screen) {
+  document.querySelectorAll(".bottom-nav-item").forEach((btn) => {
+    btn.classList.remove("is-active");
+  });
+  const targetNav = screen === "home" ? "home" : screen === "accounts" ? "accounts" : null;
+  if (targetNav) {
+    const activeBtn = document.querySelector(`.bottom-nav-item[data-nav="${targetNav}"]`);
+    if (activeBtn) activeBtn.classList.add("is-active");
+  }
 }
 
 function renderOverview() {
@@ -170,6 +211,23 @@ function renderDetail(institution) {
     : `<li>1년 이상 입출금거래가 없는 소액계좌만 계좌해지 및 잔고이전을 신청할 수 있습니다.</li><li>마이너스 통장의 (-)금액은 잔액이 '0'원으로 표시됩니다.</li><li>'해지불가' 계좌는 해당 금융기관에 문의해주시기 바랍니다.</li><li>개인연금저축은 일부 조건에 따라 해지신청이 가능합니다.</li>`;
 }
 
+function renderLoan() {
+  const loanList = document.querySelector("#loan-list");
+  if (!loanList) return;
+  loanList.innerHTML = loanContracts.map((loan) => `
+    <li class="loan-item">
+      <div class="loan-item-inner">
+        <span class="loan-type">
+          ${loan.type}
+          ${loan.isExample ? '<em class="loan-example-tag">예시</em>' : ""}
+        </span>
+        <span class="loan-institution">${loan.institution}</span>
+        <span class="loan-amount">${formatWon(loan.amount)} <span class="loan-chevron" aria-hidden="true">›</span></span>
+      </div>
+    </li>
+  `).join("");
+}
+
 function showLoading(callback, delay = 520) {
   loadingOverlay.hidden = false;
   window.setTimeout(() => {
@@ -219,8 +277,71 @@ function closeDetail({ fromHistory = false } = {}) {
     bottomNav.hidden = false;
     state.institution = null;
     overviewScroll.scrollTop = state.overviewScrollTop;
+    updateBottomNav("accounts");
   }, 220);
   if (!fromHistory) history.back();
+}
+
+// 홈 화면 → 계좌 조회 화면 전환
+function openAccounts() {
+  state.screen = "accounts";
+  homeView.classList.remove("is-active");
+  overviewView.classList.add("is-active");
+  updateBottomNav("accounts");
+}
+
+// 대출 화면 열기
+function openLoan() {
+  state.screen = "loan";
+  history.pushState({ screen: "loan" }, "", "#loan");
+  loanView.hidden = false;
+  loanScroll.scrollTop = 0;
+  homeView.classList.remove("is-active");
+  bottomNav.hidden = true;
+
+  // 로딩 오버레이 표시
+  loanLoadingOverlay.hidden = false;
+  loanLoadTimer = window.setTimeout(() => {
+    loanLoadingOverlay.hidden = true;
+    requestAnimationFrame(() => loanView.classList.add("is-active"));
+  }, 650);
+}
+
+// 대출 화면 닫기
+function closeLoan({ fromHistory = false } = {}) {
+  window.clearTimeout(loanLoadTimer);
+  loanLoadingOverlay.hidden = true;
+  loanView.classList.remove("is-active");
+  state.screen = "home";
+  window.setTimeout(() => {
+    loanView.hidden = true;
+    homeView.classList.add("is-active");
+    bottomNav.hidden = false;
+    updateBottomNav("home");
+  }, 250);
+  if (!fromHistory) history.back();
+}
+
+// 홈으로 이동
+function openHome() {
+  if (state.screen === "loan") {
+    closeLoan({ fromHistory: false });
+    return;
+  }
+  if (state.institution) {
+    history.replaceState({}, "", location.pathname);
+    closeDetail({ fromHistory: true });
+  }
+  if (state.screen === "accounts") {
+    overviewView.classList.remove("is-active");
+    state.screen = "home";
+  }
+  homeView.classList.add("is-active");
+  if (state.group !== "bank") {
+    state.group = "bank";
+    renderOverview();
+  }
+  updateBottomNav("home");
 }
 
 function showToast(message = "현재 제공되지 않는 기능입니다.") {
@@ -230,6 +351,9 @@ function showToast(message = "현재 제공되지 않는 기능입니다.") {
   toastTimer = window.setTimeout(() => { toast.hidden = true; }, 1900);
 }
 
+// ─── 이벤트 핸들러 ───────────────────────────────────────────────
+
+// 카테고리 탭
 document.querySelector(".category-tabs").addEventListener("click", (event) => {
   const tab = event.target.closest("[data-group]");
   if (tab) activateGroup(tab.dataset.group);
@@ -244,34 +368,68 @@ document.querySelector(".category-tabs").addEventListener("keydown", (event) => 
   activateGroup(next);
 });
 
+// 기관 목록 클릭
 institutionList.addEventListener("click", (event) => {
   const row = event.target.closest("[data-institution]");
   if (row) openInstitution(row.dataset.institution);
 });
 
+// 뒤로가기 (계좌 상세)
 document.querySelector("#back-button").addEventListener("click", () => closeDetail());
 
-document.querySelectorAll(".home-button").forEach((button) => button.addEventListener("click", () => {
-  if (state.institution) {
-    history.replaceState({}, "", location.pathname);
-    closeDetail({ fromHistory: true });
-  }
-  if (state.group !== "bank") {
-    state.group = "bank";
-    renderOverview();
-  }
-  overviewScroll.scrollTo({ top: 0, behavior: "smooth" });
-}));
+// 대출 뒤로가기
+document.querySelector("#loan-back-button").addEventListener("click", () => closeLoan());
 
-document.querySelectorAll(".inert-control, .bottom-nav-item:not(.is-active)").forEach((button) => {
-  button.addEventListener("click", () => showToast());
+// 대출 홈 버튼
+document.querySelector("#loan-home-button").addEventListener("click", () => openHome());
+
+// 계좌 상세 홈 버튼
+document.querySelectorAll(".home-button").forEach((button) => button.addEventListener("click", () => openHome()));
+
+// 홈 화면 서비스 그리드 클릭
+homeView.addEventListener("click", (event) => {
+  const serviceBtn = event.target.closest("[data-action]");
+  if (serviceBtn) {
+    const action = serviceBtn.dataset.action;
+    if (action === "accounts") {
+      openAccounts();
+    } else if (action === "loans") {
+      openLoan();
+    }
+    return;
+  }
+  // inert-control 클릭
+  const inert = event.target.closest(".inert-control");
+  if (inert) showToast();
 });
 
-document.querySelector(".bottom-nav-item.is-active").addEventListener("click", () => {
-  if (state.institution) closeDetail();
-  else overviewScroll.scrollTo({ top: 0, behavior: "smooth" });
+// 대출 목록 클릭
+document.querySelector("#loan-list").addEventListener("click", (event) => {
+  const item = event.target.closest(".loan-item");
+  if (item) showToast("데모에서는 지원하지 않는 기능입니다.");
 });
 
+// 바텀 네비게이션
+document.querySelectorAll(".bottom-nav-item").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const nav = btn.dataset.nav;
+    if (nav === "home") {
+      openHome();
+    } else if (nav === "accounts") {
+      if (state.screen === "home") {
+        openAccounts();
+      } else if (state.institution) {
+        closeDetail();
+      } else {
+        overviewScroll.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } else {
+      showToast();
+    }
+  });
+});
+
+// 증권 모달
 document.querySelector("#modal-confirm").addEventListener("click", () => {
   state.securitiesNoticeSeen = true;
   securitiesModal.hidden = true;
@@ -284,15 +442,37 @@ securitiesModal.addEventListener("click", (event) => {
   if (event.target === securitiesModal) securitiesModal.hidden = true;
 });
 
+// 상세 스크롤 condensed
 detailScroll.addEventListener("scroll", () => {
   detailScroll.classList.toggle("is-condensed", detailScroll.scrollTop > 85);
 }, { passive: true });
 
-window.addEventListener("popstate", () => {
-  if (state.institution) closeDetail({ fromHistory: true });
+// inert-control (overview-view 내부)
+overviewView.addEventListener("click", (event) => {
+  const inert = event.target.closest(".inert-control");
+  if (inert) showToast();
 });
 
+// popstate
+window.addEventListener("popstate", () => {
+  if (state.screen === "loan") {
+    closeLoan({ fromHistory: true });
+  } else if (state.institution) {
+    closeDetail({ fromHistory: true });
+  }
+});
+
+// Escape 키
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    if (state.screen === "loan") closeLoan();
+    else if (state.institution) closeDetail();
+  }
+});
+
+// 초기 렌더링
 renderOverview();
+renderLoan();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

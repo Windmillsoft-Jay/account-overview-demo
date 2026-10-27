@@ -11,13 +11,155 @@
     <link rel="manifest" href="./manifest.webmanifest?v=8" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=9" />
+    <link rel="stylesheet" href="./styles.css?v=10" />
     <title>내 계좌 한눈에</title>
   </head>
   <body>
     <main class="device-stage">
       <section id="app" class="app-shell" aria-live="polite">
-        <section id="overview-view" class="view is-active" aria-labelledby="overview-title">
+        <!-- HOME VIEW -->
+        <section id="home-view" class="view is-active" aria-label="홈">
+          <div class="home-scroll">
+            <!-- 헤더 -->
+            <header class="home-header">
+              <div class="home-avatar" aria-hidden="true">채</div>
+              <span class="home-username">채주병님</span>
+              <div class="home-header-icons">
+                <button type="button" class="inert-control">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+                  지점/ATM
+                </button>
+                <button type="button" class="icon-only inert-control" aria-label="알림">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </button>
+              </div>
+            </header>
+
+            <!-- 공지 배너 -->
+            <div class="home-notice-banner inert-control" role="button" tabindex="0">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+              핀테크 위크 2026 금융결제원 세미나 개최 안내
+            </div>
+
+            <!-- 세금/공과금 카드 -->
+            <div class="home-tax-card inert-control">
+              <p class="home-tax-card-sub">각종 요금을 한 눈에 조회&납부</p>
+              <h2 class="home-tax-card-title">세금/공과금 납부</h2>
+              <span class="home-tax-card-icon" aria-hidden="true">🧮</span>
+              <button type="button" class="close-btn inert-control" aria-label="닫기">×</button>
+            </div>
+
+            <!-- 서비스 섹션 -->
+            <div class="home-finance-section">
+              <div class="home-finance-header">
+                <div>
+                  <h2>내 금융 현황을</h2>
+                  <p>한눈에 확인해보세요</p>
+                </div>
+                <button type="button" class="edit-btn inert-control">편집 &gt;</button>
+              </div>
+
+              <!-- 3×2 서비스 그리드 -->
+              <div class="service-grid">
+                <button type="button" class="service-item" data-action="accounts" aria-label="내 계좌 한눈에">
+                  <span class="service-icon accounts-icon" aria-hidden="true">🏦</span>
+                  <span class="service-label">내 계좌<br>한눈에</span>
+                </button>
+                <button type="button" class="service-item inert-control" aria-label="내 카드 한눈에">
+                  <span class="service-icon cards-icon" aria-hidden="true">💳</span>
+                  <span class="service-label">내 카드<br>한눈에</span>
+                </button>
+                <button type="button" class="service-item inert-control" aria-label="내 자동이체 한눈에">
+                  <span class="service-icon auto-icon" aria-hidden="true">🔄</span>
+                  <span class="service-label">내 자동이체<br>한눈에</span>
+                </button>
+                <button type="button" class="service-item inert-control" aria-label="세금/공과금 납부">
+                  <span class="service-icon tax-icon" aria-hidden="true">🏛️</span>
+                  <span class="service-label">세금/공과금<br>납부</span>
+                </button>
+                <button type="button" class="service-item inert-control" aria-label="카드 포인트 현금화">
+                  <span class="service-icon points-icon" aria-hidden="true">🪙</span>
+                  <span class="service-label">카드 포인트<br>현금화</span>
+                </button>
+                <button type="button" class="service-item" data-action="loans" aria-label="내 대출 한눈에">
+                  <span class="service-icon loans-icon" aria-hidden="true">📊</span>
+                  <span class="service-label">내 대출<br>한눈에</span>
+                </button>
+              </div>
+
+              <button type="button" class="home-more-link inert-control">전체 서비스 보러가기 &gt;</button>
+            </div>
+
+            <!-- 즐겨찾는 계좌/카드 -->
+            <section class="home-favorites">
+              <div class="home-favorites-header">
+                <div>
+                  <h3 style="display:inline">즐겨찾는 계좌/카드</h3>
+                  <span class="info-icon" aria-hidden="true">ⓘ</span>
+                </div>
+                <button type="button" class="settings-btn inert-control">설정 &gt;</button>
+              </div>
+              <div class="fav-tabs">
+                <button type="button" class="fav-tab is-active inert-control">계좌</button>
+                <button type="button" class="fav-tab inert-control">카드</button>
+              </div>
+              <div class="fav-profile-row">
+                <div class="fav-profile-avatar" aria-hidden="true">채</div>
+                <div class="fav-profile-text">
+                  <strong>채주병님</strong>
+                  즐겨찾는 계좌를 설정해보세요
+                </div>
+              </div>
+            </section>
+
+            <!-- 내 금융 안심차단 -->
+            <section class="home-security">
+              <span class="home-security-shield" aria-hidden="true">🛡️</span>
+              <h3>내 금융 안심차단</h3>
+              <p class="home-security-subtitle">금융소비자 보호 서비스</p>
+              <div class="home-security-tags">
+                <span class="home-security-tag">#본인계좌 일괄지급정지</span>
+                <span class="home-security-tag">#오픈뱅킹 안심차단</span>
+                <span class="home-security-tag">#비대면 계좌개설 안심차단</span>
+                <span class="home-security-tag">#여신거래 안심차단</span>
+              </div>
+            </section>
+
+            <!-- 신규 서비스 추천 -->
+            <section class="home-recommend">
+              <h3>신규 서비스 추천</h3>
+              <div class="home-recommend-item inert-control" role="button" tabindex="0">
+                <span class="recommend-icon" style="background:#e8eaff" aria-hidden="true">🏛️</span>
+                <div class="recommend-text">
+                  <p class="sub">신규 서비스</p>
+                  <p class="title">세금/공과금 납부</p>
+                </div>
+                <span class="recommend-chevron" aria-hidden="true">›</span>
+              </div>
+              <div class="home-recommend-item inert-control" role="button" tabindex="0">
+                <span class="recommend-icon" style="background:#eaf5ea" aria-hidden="true">📄</span>
+                <div class="recommend-text">
+                  <p class="sub">신규 서비스</p>
+                  <p class="title">정부24 전자문서지갑</p>
+                </div>
+                <span class="recommend-chevron" aria-hidden="true">›</span>
+              </div>
+            </section>
+
+            <!-- 하단 링크 -->
+            <div class="home-bottom-links">
+              <button type="button" class="home-bottom-link inert-control">
+                <span aria-hidden="true">✏️</span> 홈 화면 편집
+              </button>
+              <button type="button" class="home-bottom-link inert-control">
+                <span aria-hidden="true">🎧</span> 고객센터 도움이 필요하신가요?
+              </button>
+            </div>
+            <div class="home-bottom-space" aria-hidden="true"></div>
+          </div>
+        </section>
+
+        <section id="overview-view" class="view" aria-labelledby="overview-title">
           <div class="view-scroll" id="overview-scroll">
             <header class="overview-header">
               <div class="title-row">
@@ -59,6 +201,36 @@
           </button>
         </section>
 
+        <!-- LOAN VIEW -->
+        <section id="loan-view" class="view" aria-label="내 대출 한눈에" hidden>
+          <div class="loan-toolbar">
+            <button id="loan-back-button" class="icon-button back-button" type="button" aria-label="뒤로가기">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg>
+            </button>
+            <h1>내 대출 한눈에</h1>
+            <button id="loan-home-button" class="icon-button" type="button" aria-label="홈">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3.8 10.5 12 3.8l8.2 6.7v8.7a1 1 0 0 1-1 1h-4.6v-6H9.4v6H4.8a1 1 0 0 1-1-1z"/></svg>
+            </button>
+          </div>
+          <div class="loan-scroll" id="loan-scroll">
+            <p class="loan-description">대출발생일, 대출종류 등 관련정보를 한눈에 확인할 수 있어요. 단, 조회정보는 실시간정보가 아닙니다. 조회 기준일을 확인해주세요.</p>
+            <div class="loan-summary-card">
+              <span class="loan-summary-label">총 대출 잔액</span>
+              <span class="loan-summary-amount">66,697,000 원</span>
+              <span class="loan-lookup-pill">조회기준일: <span id="loan-date"></span></span>
+            </div>
+            <p class="loan-count">약정 <strong>14</strong></p>
+            <ul class="loan-list" id="loan-list"></ul>
+            <ul class="loan-notes">
+              <li>대출 정보는 금융기관으로부터 수신한 정보로, 실제 대출 잔액과 상이할 수 있습니다.</li>
+              <li>대출 상환, 기한 연장 등 변경사항은 해당 금융기관을 통해 확인하시기 바랍니다.</li>
+              <li>일부 대출 상품은 조회되지 않을 수 있습니다.</li>
+              <li>본 화면은 참고용으로만 활용하시고, 정확한 정보는 해당 금융기관에 문의하세요.</li>
+            </ul>
+            <div style="height:40px" aria-hidden="true"></div>
+          </div>
+        </section>
+
         <section id="detail-view" class="view detail-view" aria-labelledby="detail-title" hidden>
           <div class="detail-toolbar">
             <button id="back-button" class="icon-button back-button" type="button" aria-label="뒤로가기">
@@ -96,11 +268,11 @@
         </section>
 
         <nav class="bottom-nav" aria-label="주요 메뉴">
-          <button type="button" class="bottom-nav-item"><span class="nav-icon home-nav-icon" aria-hidden="true"></span><span>홈</span></button>
-          <button type="button" class="bottom-nav-item is-active"><span class="nav-icon account-nav-icon" aria-hidden="true"></span><span>계좌</span></button>
-          <button type="button" class="bottom-nav-item"><span class="nav-icon card-nav-icon" aria-hidden="true"></span><span>카드</span></button>
-          <button type="button" class="bottom-nav-item"><span class="nav-icon pay-nav-icon" aria-hidden="true"></span><span>납부</span></button>
-          <button type="button" class="bottom-nav-item"><span class="nav-icon menu-nav-icon" aria-hidden="true"></span><span>전체메뉴</span></button>
+          <button type="button" class="bottom-nav-item is-active" data-nav="home"><span class="nav-icon home-nav-icon" aria-hidden="true"></span><span>홈</span></button>
+          <button type="button" class="bottom-nav-item" data-nav="accounts"><span class="nav-icon account-nav-icon" aria-hidden="true"></span><span>계좌</span></button>
+          <button type="button" class="bottom-nav-item" data-nav="cards"><span class="nav-icon card-nav-icon" aria-hidden="true"></span><span>카드</span></button>
+          <button type="button" class="bottom-nav-item" data-nav="pay"><span class="nav-icon pay-nav-icon" aria-hidden="true"></span><span>납부</span></button>
+          <button type="button" class="bottom-nav-item" data-nav="menu"><span class="nav-icon menu-nav-icon" aria-hidden="true"></span><span>전체메뉴</span></button>
         </nav>
 
         <div id="loading-overlay" class="loading-overlay" hidden aria-label="조회 중" role="status">
@@ -131,10 +303,25 @@
           </section>
         </div>
 
+        <!-- LOAN LOADING OVERLAY -->
+        <div id="loan-loading-overlay" class="loan-loading-overlay" hidden aria-label="대출 정보 조회 중" role="status">
+          <div class="loan-loader-inner" aria-hidden="true">
+            <div class="loan-loader-side loan-dot-left">
+              <span class="loan-dot"></span>
+              <span class="loan-dot"></span>
+            </div>
+            <div class="loan-loader-char">💳</div>
+            <div class="loan-loader-side loan-dot-right">
+              <span class="loan-dot"></span>
+              <span class="loan-dot"></span>
+            </div>
+          </div>
+        </div>
+
         <div id="toast" class="toast" hidden>현재 제공되지 않는 기능입니다.</div>
       </section>
     </main>
-    <script src="./app.js?v=9" defer></script>
+    <script src="./app.js?v=10" defer></script>
     <script>
       (function () {
         var d = new Date();
@@ -144,6 +331,8 @@
         document.querySelectorAll('.summary-date, .lookup-date').forEach(function (el) {
           el.textContent = '조회기준일 : ' + dateStr;
         });
+        var loanDate = document.getElementById('loan-date');
+        if (loanDate) loanDate.textContent = dateStr;
       })();
     </script>
   </body>
