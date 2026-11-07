@@ -4,17 +4,7 @@
 // bankId 는 app.js 의 groups 에 있는 기관 id 입니다 (로고·이름을 거기서 가져옴).
 // accounts: 이름 옆 숫자(계좌 수), count: 오른쪽 "N 건".
 // items 를 채우면 행을 눌렀을 때 펼쳐집니다. 비어 있으면 미지원 안내가 뜹니다.
-const accountAutopay = [
-  { bankId: "nh", accounts: 1, count: 1, items: [] },
-  { bankId: "im", accounts: 1, count: 1, items: [] },
-  { bankId: "kb", accounts: 1, count: 23, items: [] },
-  { bankId: "saemaul", accounts: 1, count: 1, items: [] },
-  { bankId: "shinhan", accounts: 1, count: 4, items: [] },
-  { bankId: "woori", accounts: 1, count: 3, items: [] },
-  { bankId: "jeonbuk", accounts: 1, count: 1, items: [] },
-  { bankId: "kbank", accounts: 1, count: 5, items: [] },
-  { bankId: "hana", accounts: 1, count: 1, items: [] }
-];
+const accountAutopay = [];
 // 예: items: [{ payee: "한국전력공사", account: "3021772*****1", amount: 0 }]
 const accountTransfers = [];
 const cardAutopay = [];
