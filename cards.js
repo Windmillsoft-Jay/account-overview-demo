@@ -18,20 +18,6 @@ const cardCompanies = [
     cards: [{ name: "KB국민 체크카드", number: "0000-0000-****-000*", type: "본인/체크", note: "-", placeholder: true }]
   },
   {
-    id: "lotte", name: "롯데카드", mark: "LOTTE", color: "#ffffff", textColor: "#e3262f", border: true, wide: true,
-    points: 299,
-    due: null,
-    recent: [0, 0, 0], limit: 0, shortLoanLimit: 0,
-    cards: [{ name: "롯데카드", number: "0000-0000-****-000*", type: "본인/체크", note: "-", placeholder: true }]
-  },
-  {
-    id: "samsung", name: "삼성카드", mark: "삼성", color: "#1c2a6e",
-    points: null,
-    due: null,
-    recent: [0, 0, 0], limit: 0, shortLoanLimit: 0,
-    cards: [{ name: "삼성카드", number: "0000-0000-****-000*", type: "본인/체크", note: "-", placeholder: true }]
-  },
-  {
     id: "shinhancard", name: "신한카드", mark: "S", color: "#2b45d8",
     points: 34,
     due: null,
@@ -41,20 +27,6 @@ const cardCompanies = [
       { name: "국민내일배움 FANtastic S 체크신한은행즉발용", number: "5594-1000-****-126*", type: "본인/체크", note: "-" },
       { name: "모두의카드 체크", number: "5107-3751-****-104*", type: "본인/체크", note: "-" }
     ]
-  },
-  {
-    id: "citicard", name: "씨티카드", mark: "citi", color: "#1c2a6e", wide: true,
-    points: null,
-    due: null,
-    recent: [0, 0, 0], limit: 0, shortLoanLimit: 0,
-    cards: [{ name: "씨티카드", number: "0000-0000-****-000*", type: "본인/체크", note: "-", placeholder: true }]
-  },
-  {
-    id: "hyundai", name: "현대카드", mark: "H", color: "#111111",
-    points: null,
-    due: null,
-    recent: [0, 0, 0], limit: 0, shortLoanLimit: 0,
-    cards: [{ name: "현대카드", number: "0000-0000-****-000*", type: "본인/체크", note: "-", placeholder: true }]
   }
 ];
 
