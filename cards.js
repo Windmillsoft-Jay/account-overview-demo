@@ -309,7 +309,6 @@ $("#cards-tabs").addEventListener("click", (event) => {
 cardsContent.addEventListener("click", (event) => {
   const row = event.target.closest("[data-card-company]");
   if (row) { openCardDetail(row.dataset.cardCompany); return; }
-  if (event.target.closest("[data-point-company]")) showToast("데모에서는 지원하지 않는 기능입니다.");
 });
 
 $("#card-detail-tabs").addEventListener("click", (event) => {
