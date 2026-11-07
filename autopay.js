@@ -153,10 +153,7 @@ autopayContent.addEventListener("click", (event) => {
   const row = event.target.closest("[data-autopay-row]");
   if (!row) return;
   const index = Number(row.dataset.autopayRow);
-  if (!accountAutopay[index].items.length) {
-    showToast("데모에서는 지원하지 않는 기능입니다.");
-    return;
-  }
+  if (!accountAutopay[index].items.length) return;
   if (autopayState.expanded.has(index)) autopayState.expanded.delete(index);
   else autopayState.expanded.add(index);
   renderAutopay();

@@ -509,12 +509,6 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  if (event.target.closest(".inert-control")) showToast();
-});
-
-// 대출 목록
-$("#loan-list").addEventListener("click", (event) => {
-  if (event.target.closest(".loan-item")) showToast("데모에서는 지원하지 않는 기능입니다.");
 });
 
 // 하단 메뉴
@@ -530,8 +524,6 @@ document.querySelectorAll(".bottom-nav-item").forEach((btn) => {
       openCards();
     } else if (key === "pay") {
       setTop("tax");
-    } else {
-      showToast();
     }
   });
 });

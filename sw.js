@@ -1,4 +1,4 @@
-const CACHE = "account-overview-demo-v15";
+const CACHE = "account-overview-demo-v16";
 const ASSETS = [
   "./index.html",
   "./styles.css?v=11",

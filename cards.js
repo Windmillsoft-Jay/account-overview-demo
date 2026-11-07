@@ -341,7 +341,3 @@ cardDetailTrack.addEventListener("click", (event) => {
 })();
 
 consentEmail.addEventListener("input", updateConsentButton);
-consentConfirm.addEventListener("click", () => {
-  if (consentConfirm.disabled) return;
-  showToast("데모에서는 지원하지 않는 기능입니다.");
-});
