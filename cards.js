@@ -7,13 +7,7 @@ const cardCompanies = [
   {
     id: "kbcard", name: "KB국민카드", mark: "KB", color: "#4e4236", textColor: "#f3c34f",
     points: 9,
-    due: {
-      unit: "KB카드",
-      account: "국민은행 933502*****452",
-      date: "2026-11-07",
-      amount: 289751,
-      overdue: 289751
-    },
+    due: null,
     recent: [0, 0, 0], limit: 0, shortLoanLimit: 0,
     cards: [{ name: "KB국민 체크카드", number: "0000-0000-****-000*", type: "본인/체크", note: "-", placeholder: true }]
   },
