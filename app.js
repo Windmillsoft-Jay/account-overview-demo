@@ -588,6 +588,12 @@ renderLoan();
 updateBottomNav();
 
 if ("serviceWorker" in navigator) {
+  let reloadingForSW = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloadingForSW) return;
+    reloadingForSW = true;
+    window.location.reload();
+  });
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("./sw.js", { updateViaCache: "none" })

@@ -1,4 +1,4 @@
-const CACHE = "account-overview-demo-v16";
+const CACHE = "account-overview-demo-v17";
 const ASSETS = [
   "./index.html",
   "./styles.css?v=11",
@@ -22,9 +22,6 @@ self.addEventListener("activate", (event) => {
     const keys = await caches.keys();
     await Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)));
     await self.clients.claim();
-
-    const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-    await Promise.all(windows.map((client) => client.navigate(client.url).catch(() => undefined)));
   })());
 });
 
