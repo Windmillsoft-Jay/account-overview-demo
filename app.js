@@ -1,3 +1,13 @@
+"use strict";
+
+// ─── 개인 정보 (위임장 등에 표시) ─────────────────────────────────────
+// 화면에 그대로 노출되는 값입니다. 데모를 다른 사람에게 보여줄 땐 여기만 바꾸면 됩니다.
+const PROFILE = {
+  name: "채주병",
+  phone: "010-3176-7219",
+  birth: "951214"
+};
+
 const groups = {
   bank: {
     summaryPrefix: "",
@@ -90,58 +100,251 @@ const groups = {
 
 const loanContracts = [];
 
+// ─── 날짜 ─────────────────────────────────────────────────────────────
+const pad2 = (n) => String(n).padStart(2, "0");
+const isoDate = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const koreanDate = (d) => `${d.getFullYear()}년 ${pad2(d.getMonth() + 1)}월 ${pad2(d.getDate())}일`;
+function previousBusinessDay(base) {
+  const d = new Date(base);
+  do { d.setDate(d.getDate() - 1); } while (d.getDay() === 0 || d.getDay() === 6);
+  return d;
+}
+const TODAY = new Date();
+const TODAY_ISO = isoDate(TODAY);
+const PREV_BUSINESS_ISO = isoDate(previousBusinessDay(TODAY));
+
+// ─── "상기 내용을 한달 간 보지 않음" 저장 ─────────────────────────────
+const NOTICE_SNOOZE_MS = 30 * 24 * 60 * 60 * 1000;
+function isNoticeSnoozed(key) {
+  try { return Number(localStorage.getItem(`notice-snooze:${key}`)) > Date.now(); }
+  catch { return false; }
+}
+function snoozeNotice(key) {
+  try { localStorage.setItem(`notice-snooze:${key}`, String(Date.now() + NOTICE_SNOOZE_MS)); }
+  catch { /* 저장소를 쓸 수 없으면 이번 세션에만 적용 */ }
+}
+
+// ─── 상태 ─────────────────────────────────────────────────────────────
 const state = {
   group: "bank",
   institution: null,
   securitiesNoticeSeen: false,
-  overviewScrollTop: 0,
-  screen: "home"  // "home" | "accounts" | "loan"
+  overviewScrollTop: 0
 };
 
-// DOM 참조
-const homeView = document.querySelector("#home-view");
-const overviewView = document.querySelector("#overview-view");
-const loanView = document.querySelector("#loan-view");
-const detailView = document.querySelector("#detail-view");
-const overviewScroll = document.querySelector("#overview-scroll");
-const detailScroll = document.querySelector("#detail-scroll");
-const loanScroll = document.querySelector("#loan-scroll");
-const institutionList = document.querySelector("#institution-list");
-const summaryPrefix = document.querySelector("#summary-prefix");
-const summaryCount = document.querySelector("#summary-count");
-const groupNote = document.querySelector("#group-note");
-const detailContent = document.querySelector("#detail-content");
-const detailTotal = document.querySelector("#detail-total");
-const detailNotes = document.querySelector("#detail-notes");
-const loadingOverlay = document.querySelector("#loading-overlay");
-const loanLoadingOverlay = document.querySelector("#loan-loading-overlay");
-const securitiesModal = document.querySelector("#securities-modal");
-const bottomNav = document.querySelector(".bottom-nav");
-const toast = document.querySelector("#toast");
+// ─── DOM 참조 ─────────────────────────────────────────────────────────
+const $ = (selector) => document.querySelector(selector);
+const homeView = $("#home-view");
+const overviewView = $("#overview-view");
+const loanView = $("#loan-view");
+const detailView = $("#detail-view");
+const overviewScroll = $("#overview-scroll");
+const detailScroll = $("#detail-scroll");
+const loanScroll = $("#loan-scroll");
+const institutionList = $("#institution-list");
+const summaryPrefix = $("#summary-prefix");
+const summaryCount = $("#summary-count");
+const groupNote = $("#group-note");
+const detailContent = $("#detail-content");
+const detailTotal = $("#detail-total");
+const detailNotes = $("#detail-notes");
+const loadingOverlay = $("#loading-overlay");
+const loanLoadingOverlay = $("#loan-loading-overlay");
+const lookupOverlay = $("#lookup-overlay");
+const securitiesModal = $("#securities-modal");
+const bottomNav = $(".bottom-nav");
+const toast = $("#toast");
 let toastTimer;
-let loanLoadTimer;
 
+// ─── 포맷 / 공통 템플릿 ───────────────────────────────────────────────
 const formatWon = (value) => `${value.toLocaleString("ko-KR")} 원`;
+const formatPoint = (value) => `${value.toLocaleString("ko-KR")} P`;
 const totalOf = (institution) => institution.accounts.reduce((sum, account) => sum + account.balance, 0);
 const accountCountOf = (group) => group.institutions.reduce((sum, institution) => sum + institution.accounts.length, 0);
+const countClass = (n) => (n > 1 ? " is-many" : "");
 
-function logoTemplate(institution) {
+function logoTemplate(institution, extraClass = "") {
   const wide = institution.wide ? " logo-wide" : "";
   const textColor = institution.textColor || "#fff";
-  return `<span class="bank-logo${wide}" style="--logo-bg:${institution.color};color:${textColor}">${institution.mark}</span>`;
+  const ring = institution.border ? ";box-shadow:inset 0 0 0 1px #e1e4ea" : "";
+  return `<span class="bank-logo${wide} ${extraClass}" style="--logo-bg:${institution.color};color:${textColor}${ring}">${institution.mark}</span>`;
 }
 
-function updateBottomNav(screen) {
-  document.querySelectorAll(".bottom-nav-item").forEach((btn) => {
-    btn.classList.remove("is-active");
-  });
-  const targetNav = screen === "home" ? "home" : screen === "accounts" ? "accounts" : null;
-  if (targetNav) {
-    const activeBtn = document.querySelector(`.bottom-nav-item[data-nav="${targetNav}"]`);
-    if (activeBtn) activeBtn.classList.add("is-active");
+function findInstitution(id) {
+  for (const group of Object.values(groups)) {
+    const found = group.institutions.find((item) => item.id === id);
+    if (found) return found;
   }
+  return null;
 }
 
+const EMPTY_ILLUSTRATION = `
+  <svg class="empty-illust" viewBox="0 0 96 96" aria-hidden="true">
+    <rect x="19" y="15" width="52" height="66" rx="7" fill="#2a59c9"/>
+    <rect x="21" y="17" width="48" height="62" rx="6" fill="#3d72e6"/>
+    <rect x="26" y="22" width="38" height="50" rx="3" fill="#f5f7fb"/>
+    <rect x="26" y="66" width="38" height="6" fill="#dfe4ec"/>
+    <rect x="31" y="33" width="21" height="3.2" rx="1.6" fill="#97a1b4"/>
+    <rect x="31" y="41" width="16" height="3.2" rx="1.6" fill="#97a1b4"/>
+    <rect x="31" y="49" width="19" height="3.2" rx="1.6" fill="#97a1b4"/>
+    <rect x="36" y="11" width="18" height="9" rx="3" fill="#5a8ff2"/>
+    <g class="empty-badge">
+      <circle cx="67" cy="45" r="14.5" fill="#17a05d"/>
+      <circle cx="67" cy="45" r="11.5" fill="#22b46c"/>
+      <rect x="65.2" y="36.5" width="3.6" height="11.5" rx="1.8" fill="#fff"/>
+      <circle cx="67" cy="52.6" r="2.1" fill="#fff"/>
+    </g>
+  </svg>`;
+
+function emptyStateTemplate(message, hint = "") {
+  return `
+    <div class="empty-state">
+      ${EMPTY_ILLUSTRATION}
+      <p class="empty-message">${message}</p>
+      ${hint ? `<p class="empty-hint">${hint}</p>` : ""}
+    </div>`;
+}
+
+// ─── 토스트 / 로딩 ────────────────────────────────────────────────────
+function showToast(message = "현재 제공되지 않는 기능입니다.") {
+  window.clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.hidden = false;
+  toastTimer = window.setTimeout(() => { toast.hidden = true; }, 1900);
+}
+
+// 계좌 화면에서 쓰던 흰색 로딩
+function showLoading(callback, delay = 520) {
+  loadingOverlay.hidden = false;
+  window.setTimeout(() => {
+    loadingOverlay.hidden = true;
+    callback();
+  }, delay);
+}
+
+// 카드/자동이체 화면의 어두운 조회 로딩
+let lookupTimer;
+function showLookup(callback, delay = 620) {
+  window.clearTimeout(lookupTimer);
+  lookupOverlay.hidden = false;
+  lookupTimer = window.setTimeout(() => {
+    lookupOverlay.hidden = true;
+    if (callback) callback();
+  }, delay);
+}
+
+// ─── 화면 전환 (탭 화면 + 쌓이는 하위 화면) ───────────────────────────
+// 탭 화면: 하단 메뉴가 보이는 화면 (홈 / 계좌 / 카드 / 납부)
+// 하위 화면: 뒤로가기로 닫히는 화면, 하단 메뉴 숨김
+const topViews = {};
+const subViews = {};
+const nav = { top: "home", stack: [] };
+const NAV_KEY_BY_TOP = { home: "home", accounts: "accounts", cards: "cards", tax: "pay" };
+let ignorePops = 0;
+let lastRootBackAt = 0;
+
+function registerTop(name, el, hooks = {}) { topViews[name] = { el, ...hooks }; }
+function registerSub(name, el, hooks = {}) { subViews[name] = { el, ...hooks }; }
+
+function currentViewEl() {
+  return nav.stack.length ? subViews[nav.stack[nav.stack.length - 1]].el : topViews[nav.top].el;
+}
+
+function activateView(el) {
+  window.clearTimeout(el.hideTimer);
+  el.hidden = false;
+  el.classList.remove("is-leaving");
+  void el.offsetWidth;
+  el.classList.add("is-active");
+}
+
+function deactivateView(el) {
+  el.classList.remove("is-active", "is-leaving");
+  window.clearTimeout(el.hideTimer);
+  el.hideTimer = window.setTimeout(() => {
+    if (!el.classList.contains("is-active")) el.hidden = true;
+  }, 280);
+}
+
+function updateBottomNav() {
+  const key = NAV_KEY_BY_TOP[nav.top];
+  document.querySelectorAll(".bottom-nav-item").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.nav === key);
+  });
+  bottomNav.hidden = nav.stack.length > 0;
+}
+
+function closeAllSubs() {
+  if (!nav.stack.length) return;
+  const depth = nav.stack.length;
+  while (nav.stack.length) {
+    const sub = subViews[nav.stack.pop()];
+    window.clearTimeout(sub.el.hideTimer);
+    sub.el.classList.remove("is-active", "is-leaving");
+    sub.el.hidden = true;
+    if (sub.onClose) sub.onClose();
+  }
+  Object.values(topViews).forEach((top) => top.el.classList.remove("is-leaving"));
+  ignorePops += 1;
+  history.go(-depth);
+}
+
+function setTop(name) {
+  const next = topViews[name];
+  if (!next) return;
+  closeAllSubs();
+  if (nav.top !== name) {
+    deactivateView(topViews[nav.top].el);
+    nav.top = name;
+  }
+  activateView(next.el);
+  if (next.onEnter) next.onEnter();
+  updateBottomNav();
+}
+
+function pushSub(name) {
+  const sub = subViews[name];
+  if (!sub || nav.stack.includes(name)) return;
+  const under = currentViewEl();
+  under.classList.remove("is-active");
+  under.classList.add("is-leaving");
+  nav.stack.push(name);
+  activateView(sub.el);
+  history.pushState({ sub: name, depth: nav.stack.length }, "");
+  updateBottomNav();
+}
+
+function popSubVisual() {
+  const name = nav.stack.pop();
+  if (!name) return;
+  const sub = subViews[name];
+  deactivateView(sub.el);
+  const under = currentViewEl();
+  window.clearTimeout(under.hideTimer);
+  under.hidden = false;
+  under.classList.remove("is-leaving");
+  under.classList.add("is-active");
+  if (sub.onClose) sub.onClose();
+  updateBottomNav();
+}
+
+// 화면의 뒤로가기 버튼도 브라우저 히스토리를 거쳐서 닫습니다.
+function popSub() {
+  if (nav.stack.length) history.back();
+}
+
+// ─── 모달 공통 ────────────────────────────────────────────────────────
+const modals = [];
+function registerModal(el, onDismiss) { modals.push({ el, onDismiss }); }
+function closeOpenModal() {
+  const open = modals.find((modal) => !modal.el.hidden);
+  if (!open) return false;
+  open.el.hidden = true;
+  if (open.onDismiss) open.onDismiss();
+  return true;
+}
+
+// ─── 계좌 한눈에 ──────────────────────────────────────────────────────
 function renderOverview() {
   const group = groups[state.group];
   const count = accountCountOf(group);
@@ -196,8 +399,36 @@ function renderDetail(institution) {
     : `<li>1년 이상 입출금거래가 없는 소액계좌만 계좌해지 및 잔고이전을 신청할 수 있습니다.</li><li>마이너스 통장의 (-)금액은 잔액이 '0'원으로 표시됩니다.</li><li>'해지불가' 계좌는 해당 금융기관에 문의해주시기 바랍니다.</li><li>개인연금저축은 일부 조건에 따라 해지신청이 가능합니다.</li>`;
 }
 
+function activateGroup(nextGroup, { bypassNotice = false } = {}) {
+  if (nextGroup === state.group) return;
+  if (nextGroup === "securities" && !state.securitiesNoticeSeen && !isNoticeSnoozed("securities") && !bypassNotice) {
+    $("#month-checkbox").checked = false;
+    securitiesModal.hidden = false;
+    return;
+  }
+  showLoading(() => {
+    state.group = nextGroup;
+    renderOverview();
+    overviewScroll.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
+function openInstitution(id) {
+  const institution = groups[state.group].institutions.find((item) => item.id === id);
+  if (!institution) return;
+  state.overviewScrollTop = overviewScroll.scrollTop;
+  state.institution = institution;
+  showLoading(() => {
+    renderDetail(institution);
+    detailScroll.scrollTop = 0;
+    detailScroll.classList.remove("is-condensed");
+    pushSub("detail");
+  }, 440);
+}
+
+// ─── 대출 한눈에 ──────────────────────────────────────────────────────
 function renderLoan() {
-  const loanList = document.querySelector("#loan-list");
+  const loanList = $("#loan-list");
   if (!loanList) return;
   loanList.innerHTML = loanContracts.map((loan) => `
     <li class="loan-item">
@@ -211,253 +442,170 @@ function renderLoan() {
       </div>
     </li>
   `).join("");
+  const total = loanContracts.reduce((sum, loan) => sum + loan.amount, 0);
+  $(".loan-summary-amount").textContent = formatWon(total);
+  $(".loan-count strong").textContent = String(loanContracts.length);
 }
 
-function showLoading(callback, delay = 520) {
-  loadingOverlay.hidden = false;
-  window.setTimeout(() => {
-    loadingOverlay.hidden = true;
-    callback();
-  }, delay);
-}
-
-function activateGroup(nextGroup, { bypassNotice = false } = {}) {
-  if (nextGroup === state.group) return;
-  if (nextGroup === "securities" && !state.securitiesNoticeSeen && !bypassNotice) {
-    securitiesModal.hidden = false;
-    return;
-  }
-  showLoading(() => {
-    state.group = nextGroup;
-    renderOverview();
-    overviewScroll.scrollTo({ top: 0, behavior: "smooth" });
-  });
-}
-
-function openInstitution(id, pushHistory = true) {
-  const institution = groups[state.group].institutions.find((item) => item.id === id);
-  if (!institution) return;
-  state.overviewScrollTop = overviewScroll.scrollTop;
-  state.institution = institution;
-  showLoading(() => {
-    renderDetail(institution);
-    detailScroll.scrollTop = 0;
-    detailScroll.classList.remove("is-condensed");
-    overviewView.classList.remove("is-active");
-    overviewView.classList.add("is-leaving");
-    detailView.hidden = false;
-    bottomNav.hidden = true;
-    requestAnimationFrame(() => detailView.classList.add("is-active"));
-    if (pushHistory) history.pushState({ detail: id, group: state.group }, "", `#${state.group}/${id}`);
-  }, 440);
-}
-
-function closeDetail({ fromHistory = false } = {}) {
-  if (!state.institution) return;
-  detailView.classList.remove("is-active");
-  overviewView.classList.remove("is-leaving");
-  overviewView.classList.add("is-active");
-  window.setTimeout(() => {
-    detailView.hidden = true;
-    bottomNav.hidden = false;
-    state.institution = null;
-    overviewScroll.scrollTop = state.overviewScrollTop;
-    updateBottomNav("accounts");
-  }, 220);
-  if (!fromHistory) history.back();
-}
-
-// 홈 화면 → 계좌 조회 화면 전환
-function openAccounts() {
-  state.screen = "accounts";
-  homeView.classList.remove("is-active");
-  overviewView.classList.add("is-active");
-  updateBottomNav("accounts");
-}
-
-// 대출 화면 열기
+let loanLoadTimer;
 function openLoan() {
-  state.screen = "loan";
-  history.pushState({ screen: "loan" }, "", "#loan");
-  loanView.hidden = false;
-  loanScroll.scrollTop = 0;
-  homeView.classList.remove("is-active");
-  bottomNav.hidden = true;
-
-  // 로딩 오버레이 표시
+  window.clearTimeout(loanLoadTimer);
   loanLoadingOverlay.hidden = false;
   loanLoadTimer = window.setTimeout(() => {
     loanLoadingOverlay.hidden = true;
-    requestAnimationFrame(() => loanView.classList.add("is-active"));
+    loanScroll.scrollTop = 0;
+    pushSub("loan");
   }, 650);
 }
 
-// 대출 화면 닫기
-function closeLoan({ fromHistory = false } = {}) {
-  window.clearTimeout(loanLoadTimer);
-  loanLoadingOverlay.hidden = true;
-  loanView.classList.remove("is-active");
-  state.screen = "home";
-  window.setTimeout(() => {
-    loanView.hidden = true;
-    homeView.classList.add("is-active");
-    bottomNav.hidden = false;
-    updateBottomNav("home");
-  }, 250);
-  if (!fromHistory) history.back();
-}
-
-// 홈으로 이동
-function openHome() {
-  if (state.screen === "loan") {
-    closeLoan({ fromHistory: false });
-    return;
+// ─── 화면 등록 ────────────────────────────────────────────────────────
+registerTop("home", homeView, {
+  onEnter() {
+    if (state.group !== "bank") {
+      state.group = "bank";
+      renderOverview();
+    }
   }
-  if (state.institution) {
-    history.replaceState({}, "", location.pathname);
-    closeDetail({ fromHistory: true });
+});
+registerTop("accounts", overviewView, {
+  onEnter() { overviewScroll.scrollTop = state.overviewScrollTop; }
+});
+registerSub("detail", detailView, {
+  onClose() { state.institution = null; }
+});
+registerSub("loan", loanView, {
+  onClose() {
+    window.clearTimeout(loanLoadTimer);
+    loanLoadingOverlay.hidden = true;
   }
-  if (state.screen === "accounts") {
-    overviewView.classList.remove("is-active");
-    state.screen = "home";
-  }
-  homeView.classList.add("is-active");
-  if (state.group !== "bank") {
-    state.group = "bank";
-    renderOverview();
-  }
-  updateBottomNav("home");
-}
+});
+registerModal(securitiesModal);
 
-function showToast(message = "현재 제공되지 않는 기능입니다.") {
-  window.clearTimeout(toastTimer);
-  toast.textContent = message;
-  toast.hidden = false;
-  toastTimer = window.setTimeout(() => { toast.hidden = true; }, 1900);
-}
+// 홈 그리드 동작. 다른 파일(cards.js 등)이 여기에 항목을 추가합니다.
+const homeActions = {
+  accounts: () => setTop("accounts"),
+  loans: () => openLoan()
+};
 
-// ─── 이벤트 핸들러 ───────────────────────────────────────────────
-
+// ─── 이벤트 ───────────────────────────────────────────────────────────
 // 카테고리 탭
-document.querySelector(".category-tabs").addEventListener("click", (event) => {
+$(".category-tabs").addEventListener("click", (event) => {
   const tab = event.target.closest("[data-group]");
   if (tab) activateGroup(tab.dataset.group);
 });
 
-document.querySelector(".category-tabs").addEventListener("keydown", (event) => {
-  if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-  const order = ['bank', 'secondary', 'securities'];
-  const direction = event.key === 'ArrowRight' ? 1 : -1;
+$(".category-tabs").addEventListener("keydown", (event) => {
+  if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+  const order = ["bank", "secondary", "securities"];
+  const direction = event.key === "ArrowRight" ? 1 : -1;
   const next = order[(order.indexOf(state.group) + direction + order.length) % order.length];
   document.querySelector(`[data-group="${next}"]`).focus();
   activateGroup(next);
 });
 
-// 기관 목록 클릭
+// 기관 목록
 institutionList.addEventListener("click", (event) => {
   const row = event.target.closest("[data-institution]");
   if (row) openInstitution(row.dataset.institution);
 });
 
-// 뒤로가기 (계좌 상세)
-document.querySelector("#back-button").addEventListener("click", () => closeDetail());
+// 문서 전체 위임: 홈 버튼, 뒤로가기 버튼, 홈 그리드, 미지원 버튼
+document.addEventListener("click", (event) => {
+  if (event.target.closest(".home-button")) { setTop("home"); return; }
+  if (event.target.closest("[data-back]")) { popSub(); return; }
 
-// 대출 뒤로가기
-document.querySelector("#loan-back-button").addEventListener("click", () => closeLoan());
-
-// 대출 홈 버튼
-document.querySelector("#loan-home-button").addEventListener("click", () => openHome());
-
-// 계좌 상세 홈 버튼
-document.querySelectorAll(".home-button").forEach((button) => button.addEventListener("click", () => openHome()));
-
-// 홈 화면 서비스 그리드 클릭
-homeView.addEventListener("click", (event) => {
-  const serviceBtn = event.target.closest("[data-action]");
-  if (serviceBtn) {
-    const action = serviceBtn.dataset.action;
-    if (action === "accounts") {
-      openAccounts();
-    } else if (action === "loans") {
-      openLoan();
-    }
+  const actionBtn = event.target.closest("[data-action]");
+  if (actionBtn && homeView.contains(actionBtn)) {
+    const action = homeActions[actionBtn.dataset.action];
+    if (action) action();
     return;
   }
-  // inert-control 클릭
-  const inert = event.target.closest(".inert-control");
-  if (inert) showToast();
+
+  if (event.target.closest(".inert-control")) showToast();
 });
 
-// 대출 목록 클릭
-document.querySelector("#loan-list").addEventListener("click", (event) => {
-  const item = event.target.closest(".loan-item");
-  if (item) showToast("데모에서는 지원하지 않는 기능입니다.");
+// 대출 목록
+$("#loan-list").addEventListener("click", (event) => {
+  if (event.target.closest(".loan-item")) showToast("데모에서는 지원하지 않는 기능입니다.");
 });
 
-// 바텀 네비게이션
+// 하단 메뉴
 document.querySelectorAll(".bottom-nav-item").forEach((btn) => {
   btn.addEventListener("click", () => {
-    const nav = btn.dataset.nav;
-    if (nav === "home") {
-      openHome();
-    } else if (nav === "accounts") {
-      if (state.screen === "home") {
-        openAccounts();
-      } else if (state.institution) {
-        closeDetail();
-      } else {
-        overviewScroll.scrollTo({ top: 0, behavior: "smooth" });
-      }
+    const key = btn.dataset.nav;
+    if (key === "home") {
+      setTop("home");
+    } else if (key === "accounts") {
+      if (nav.top === "accounts") overviewScroll.scrollTo({ top: 0, behavior: "smooth" });
+      else setTop("accounts");
+    } else if (key === "cards" && typeof openCards === "function") {
+      openCards();
+    } else if (key === "pay") {
+      setTop("tax");
     } else {
       showToast();
     }
   });
 });
 
-// 증권 모달
-document.querySelector("#modal-confirm").addEventListener("click", () => {
+// 증권 안내 모달
+$("#modal-confirm").addEventListener("click", () => {
+  if ($("#month-checkbox").checked) snoozeNotice("securities");
   state.securitiesNoticeSeen = true;
   securitiesModal.hidden = true;
   activateGroup("securities", { bypassNotice: true });
 });
-
-document.querySelector("#modal-close").addEventListener("click", () => { securitiesModal.hidden = true; });
-
+$("#modal-close").addEventListener("click", () => { securitiesModal.hidden = true; });
 securitiesModal.addEventListener("click", (event) => {
   if (event.target === securitiesModal) securitiesModal.hidden = true;
 });
 
-// 상세 스크롤 condensed
+// 계좌 상세 스크롤 축소
 detailScroll.addEventListener("scroll", () => {
   detailScroll.classList.toggle("is-condensed", detailScroll.scrollTop > 85);
 }, { passive: true });
 
-// inert-control (overview-view 내부)
-overviewView.addEventListener("click", (event) => {
-  const inert = event.target.closest(".inert-control");
-  if (inert) showToast();
+// 뒤로가기: 모달 → 하위 화면 → (최상위) "한 번 더 뒤로가기" 안내
+window.addEventListener("popstate", () => {
+  if (ignorePops > 0) { ignorePops -= 1; return; }
+  if (closeOpenModal()) {
+    history.pushState({ restore: true }, "");
+    return;
+  }
+  if (nav.stack.length) {
+    popSubVisual();
+    return;
+  }
+  if (Date.now() - lastRootBackAt < 2000) {
+    history.back();
+    return;
+  }
+  lastRootBackAt = Date.now();
+  showToast("한 번 더 뒤로가기를 하시면 앱이 종료됩니다.");
+  history.pushState({ guard: true }, "");
 });
 
-// popstate
-window.addEventListener("popstate", () => {
-  if (state.screen === "loan") {
-    closeLoan({ fromHistory: true });
-  } else if (state.institution) {
-    closeDetail({ fromHistory: true });
-  }
-});
+// 크롬은 사용자 조작 없이 넣은 히스토리를 건너뛰므로, 첫 터치 때 보호 항목을 넣습니다.
+history.replaceState({ base: true }, "");
+document.addEventListener("pointerdown", () => {
+  if (!nav.stack.length) history.pushState({ guard: true }, "");
+}, { once: true, capture: true });
 
 // Escape 키
 window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    if (state.screen === "loan") closeLoan();
-    else if (state.institution) closeDetail();
-  }
+  if (event.key !== "Escape") return;
+  if (closeOpenModal()) return;
+  popSub();
 });
 
-// 초기 렌더링
+// ─── 초기화 ───────────────────────────────────────────────────────────
+document.querySelectorAll(".summary-date, .lookup-date").forEach((el) => {
+  el.textContent = `조회기준일 : ${TODAY_ISO}`;
+});
+$("#loan-date").textContent = TODAY_ISO;
 renderOverview();
 renderLoan();
+updateBottomNav();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

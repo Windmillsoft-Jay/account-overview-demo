@@ -327,3 +327,216 @@ h1 { margin: 0; font-size: clamp(26px, 6.6vw, 30px); line-height: 1.25; letter-s
 .loan-dot-right .loan-dot:nth-child(1) { background: #4dcca8; }
 .loan-dot-right .loan-dot:nth-child(2) { background: #7dd67a; }
 @keyframes dot-float { from { transform: translateY(4px); opacity: .6; } to { transform: translateY(-4px); opacity: 1; } }
+
+/* =====================================================================
+   v11 추가 기능: 내 카드 한눈에 / 카드 조회 / 포인트 현금화 위임동의 /
+   내 자동이체 한눈에 / 세금·공과금 납부
+   ===================================================================== */
+
+.view[hidden] { display: none; }
+
+/* ----- 공통 레이아웃 ----- */
+.feature-view { display: flex; flex-direction: column; }
+.feature-header { position: relative; z-index: 2; flex: none; padding-top: 22px; border-bottom: 1px solid var(--line); background: #fff; }
+.feature-header.is-sub { padding-top: 8px; }
+.feature-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10px 0 20px; }
+.feature-title-row h1, .sub-toolbar h1 { font-size: 22px; font-weight: 750; letter-spacing: -.05em; }
+.sub-toolbar { min-height: 52px; display: grid; grid-template-columns: 40px minmax(0, 1fr) 44px; align-items: center; padding: 0 8px 0 4px; }
+.sub-toolbar h1 { overflow: hidden; font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.sub-toolbar .back-button { width: 40px; }
+.sub-toolbar .home-button { justify-self: end; }
+.feature-desc { margin: 6px 20px 0; color: #858b97; font-size: 12.5px; line-height: 1.5; letter-spacing: -.03em; }
+.feature-desc.is-sub { margin-top: 0; }
+.feature-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.feature-scroll::-webkit-scrollbar { display: none; }
+.nav-space { height: calc(var(--nav-height) + 24px); }
+.nav-space.is-tall { height: calc(var(--nav-height) + 92px); }
+
+.pill-tabs { display: flex; gap: 8px; padding: 14px 20px; overflow-x: auto; scrollbar-width: none; }
+.pill-tabs::-webkit-scrollbar { display: none; }
+.pill-tabs button { flex: none; min-height: 38px; padding: 0 16px; border: 1px solid #dfe2e9; border-radius: 20px; background: #fff; color: #4d535e; font-size: 14.5px; font-weight: 600; letter-spacing: -.03em; cursor: pointer; transition: background .18s, color .18s, border-color .18s, transform .12s; }
+.pill-tabs button:active { transform: scale(.97); }
+.pill-tabs button[aria-selected="true"] { border-color: transparent; background: linear-gradient(120deg, #2d6cf0, #1f58df); color: #fff; box-shadow: 0 6px 14px rgba(36, 92, 226, .22); }
+
+.lookup-caption { display: inline-flex; align-items: center; gap: 4px; color: #6f7582; font-size: 13px; }
+.lookup-date-text { color: #6f7582; font-size: 13px; white-space: nowrap; }
+.info-dot { width: 14px; height: 14px; display: inline-grid; place-items: center; border: 1px solid #9aa0ab; border-radius: 50%; color: #8a909b; font-size: 9px; font-style: normal; font-weight: 700; line-height: 1; }
+.lookup-counts { color: #3a3f4a; font-size: 15.5px; font-weight: 600; letter-spacing: -.03em; }
+.lookup-counts em { color: #2f56d6; font-style: normal; }
+.row-count { color: #2f3440; font-size: 15px; font-weight: 550; white-space: nowrap; }
+.row-count.is-many { color: #2f56d6; }
+.link-action { border: 0; padding: 0; background: none; color: #3157c9; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.link-action span { margin-left: 2px; color: #9aa3b5; }
+.outline-wide { width: 100%; min-height: 42px; margin-top: 12px; border: 1px solid #e1e4ea; border-radius: 8px; background: #fff; color: #2c4a9c; font-size: 14.5px; font-weight: 650; letter-spacing: -.03em; cursor: pointer; }
+.outline-wide span { margin-left: 6px; }
+.feature-notes { margin: 0; padding: 18px 22px 8px 38px; color: #5f6570; font-size: 13px; line-height: 1.6; letter-spacing: -.02em; }
+.feature-notes li { padding-bottom: 6px; }
+.bank-logo.logo-sm { width: 26px; height: 26px; flex-basis: 26px; font-size: 8px; }
+
+.soft-box { border-radius: 12px; background: #f6f7f9; }
+.kv-rows { display: grid; gap: 8px; margin: 0; }
+.kv-rows div { display: flex; justify-content: space-between; gap: 16px; font-size: 14.5px; }
+.kv-rows dt { flex: none; color: #4d535e; }
+.kv-rows dd { margin: 0; color: #2c313b; text-align: right; }
+
+/* ----- 빈 화면 ----- */
+.empty-state { display: flex; flex-direction: column; align-items: center; padding: 52px 4px 20px; text-align: center; }
+.empty-illust { width: 104px; height: 104px; }
+.empty-badge { transform-box: fill-box; transform-origin: center; }
+.replay .empty-badge, .autopay-content .empty-badge { animation: badge-pop .5s .12s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes badge-pop { from { transform: scale(0); opacity: 0; } }
+.empty-message { margin: 26px 0 0; color: #2f3440; font-size: 16px; letter-spacing: -.03em; }
+.empty-hint { width: 100%; margin: 26px 0 0; padding: 16px 20px; border-radius: 10px; background: #f3f4f6; color: #555b66; font-size: 14px; line-height: 1.55; }
+
+/* ----- 이용 전 안내 (전체 화면 / 시트) ----- */
+.notice-view { display: flex; flex-direction: column; }
+.notice-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 26px 24px 12px; scrollbar-width: none; }
+.notice-scroll::-webkit-scrollbar { display: none; }
+.notice-service { margin: 0 0 30px; color: #3a3f4a; font-size: 19px; font-weight: 650; letter-spacing: -.04em; }
+.notice-heading { margin: 0 0 24px; color: #22262e; font-size: 22px; font-weight: 750; line-height: 1.4; letter-spacing: -.05em; }
+.notice-list { margin: 0; padding-left: 20px; color: #3d4250; font-size: 15px; line-height: 1.6; letter-spacing: -.03em; }
+.notice-list li { padding: 0 0 12px 2px; }
+.notice-footer { flex: none; padding: 10px 20px calc(16px + env(safe-area-inset-bottom)); background: #fff; box-shadow: 0 -14px 18px rgba(255, 255, 255, .92); }
+.circle-check { position: relative; display: flex; align-items: center; gap: 10px; margin: 4px 2px 16px; color: #3d4250; font-size: 15px; cursor: pointer; }
+.circle-check input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.circle-check-mark { position: relative; width: 22px; height: 22px; flex: none; border: 1.5px solid #8a909b; border-radius: 50%; transition: background .15s, border-color .15s; }
+.circle-check-mark::after { content: ""; position: absolute; left: 6px; top: 3px; width: 5px; height: 10px; border: solid #8a909b; border-width: 0 1.8px 1.8px 0; transform: rotate(45deg); }
+.circle-check input:checked + .circle-check-mark { border-color: #2563e6; background: #2563e6; }
+.circle-check input:checked + .circle-check-mark::after { border-color: #fff; }
+.circle-check input:focus-visible + .circle-check-mark { outline: 3px solid rgba(63, 128, 247, .36); outline-offset: 2px; }
+.solid-button { width: 100%; min-height: 52px; border: 0; border-radius: 10px; background: linear-gradient(110deg, #1e5ce6, #1a4fd6); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+.notice-sheet { max-height: calc(100% - 24px); }
+.notice-sheet .modal-scroll ul { color: #3d4250; font-size: 14.5px; }
+.notice-sheet .circle-check { margin: 0 2px 14px; }
+.sheet-extra { margin: 4px 0 0; padding-top: 16px; border-top: 1px solid #e3e5ea; color: #5d6470; font-size: 14px; line-height: 1.55; }
+
+/* ----- 조회 로딩 (어두운 배경) ----- */
+.lookup-overlay { position: absolute; inset: 0; z-index: 78; display: grid; place-items: center; background: rgba(24, 27, 34, .55); }
+.lookup-overlay[hidden] { display: none; }
+.lookup-loader { display: flex; align-items: center; gap: 9px; }
+.lookup-loader i { width: 10px; height: 10px; border-radius: 50%; animation: lookup-dot .9s ease-in-out infinite; }
+.lookup-loader i:nth-of-type(odd) { background: #2e8bf0; }
+.lookup-loader i:nth-of-type(even) { background: #22c48a; }
+.lookup-loader i:nth-of-type(2) { animation-delay: .12s; }
+.lookup-loader i:nth-of-type(3) { animation-delay: .24s; }
+.lookup-loader i:nth-of-type(4) { animation-delay: .36s; }
+.lookup-char { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, .2); animation: char-bob .9s ease-in-out infinite; }
+.lookup-char svg { width: 28px; height: 28px; }
+@keyframes lookup-dot { 0%, 100% { transform: translateY(0); opacity: .7; } 50% { transform: translateY(-6px); opacity: 1; } }
+@keyframes char-bob { 50% { transform: translateY(-3px); } }
+
+/* ----- 내 카드 한눈에 ----- */
+.lookup-summary { padding: 16px 20px 14px; }
+.lookup-summary-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lookup-summary-main { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+.lookup-summary.is-points .lookup-counts { display: block; margin-top: 8px; }
+.card-company-list, .point-list { border-top: 1px solid var(--line); }
+.card-company-row, .point-row { width: 100%; min-height: 68px; display: grid; align-items: center; gap: 10px; padding: 8px 20px; border: 0; border-bottom: 1px solid var(--line); background: #fff; text-align: left; cursor: pointer; transition: background .15s; }
+.card-company-row { grid-template-columns: 18px 39px minmax(0, 1fr) auto 14px; }
+.point-row { grid-template-columns: 39px minmax(0, 1fr) auto 14px; }
+.card-company-row:active, .point-row:active, .autopay-row:active { background: #f7f9fc; }
+.point-total { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; color: #3a3f4a; font-size: 15px; }
+.point-total > span { display: inline-flex; align-items: center; gap: 6px; }
+.point-total strong { font-size: 19px; font-weight: 750; letter-spacing: -.03em; }
+.info-dot.is-outline { width: 16px; height: 16px; }
+.point-value { color: #3a3f4a; font-size: 15px; white-space: nowrap; }
+.point-value em { margin-right: 2px; color: #2f56d6; font-style: normal; font-weight: 600; }
+
+/* ----- 카드 조회 (상세) ----- */
+.detail-company { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: -4px; color: #3d4250; font-size: 15px; font-weight: 600; letter-spacing: -.03em; }
+#card-detail-view .feature-header { border-bottom: 0; }
+.tab-pager { flex: 1; min-height: 0; overflow: hidden; }
+.tab-track { width: 300%; height: 100%; display: flex; transition: transform .32s cubic-bezier(.22, .8, .25, 1); }
+.tab-track.no-anim { transition: none; }
+.tab-panel { width: calc(100% / 3); height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 4px 18px 30px; scrollbar-width: none; }
+.tab-panel::-webkit-scrollbar { display: none; }
+.amount-card { position: relative; overflow: hidden; padding: 18px 18px 20px; border-radius: 12px; background: linear-gradient(115deg, #2f7af0 0%, #2a55e6 52%, #4a2fd8 100%); color: #fff; box-shadow: 0 10px 22px rgba(52, 82, 220, .18); }
+.amount-card::before { content: ""; position: absolute; left: 45%; top: -120px; width: 180px; height: 180px; border: 1px solid rgba(255, 255, 255, .1); transform: rotate(45deg); }
+.amount-card > * { position: relative; }
+.amount-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: rgba(255, 255, 255, .9); font-size: 14px; }
+.lookup-pill { padding: 4px 8px; border-radius: 6px; background: rgba(30, 20, 120, .35); color: rgba(255, 255, 255, .86); font-size: 11px; white-space: nowrap; }
+.amount-card-value { display: block; margin-top: 12px; font-size: 26px; font-weight: 800; letter-spacing: -.04em; }
+.amount-card-sub { display: block; margin-top: 6px; color: rgba(255, 255, 255, .82); font-size: 12.5px; }
+.amount-card-rows { display: grid; gap: 6px; margin: 14px 0 0; font-size: 13px; }
+.amount-card-rows div { display: flex; justify-content: space-between; }
+.amount-card-rows dt { color: rgba(255, 255, 255, .86); }
+.amount-card-rows dd { margin: 0; font-size: 14px; }
+.amount-card-rows .is-average dd { color: #6ff0ff; font-weight: 600; }
+.due-box { display: flex; flex-direction: column; margin-top: 14px; padding: 18px 18px 16px; }
+.due-amount { align-self: flex-end; margin-top: 16px; font-size: 18px; font-weight: 750; letter-spacing: -.03em; }
+.due-overdue { align-self: flex-end; margin-top: 4px; color: #5f6570; font-size: 13px; }
+.tab-panel .feature-notes { padding: 20px 4px 4px 20px; }
+.guide-link { width: 100%; min-height: 52px; margin-top: 16px; padding: 0 2px; border: 0; border-top: 1px solid var(--line); background: #fff; color: #4d535e; font-size: 15px; text-align: left; cursor: pointer; }
+.month-list { display: grid; gap: 12px; margin-top: 16px; }
+.month-item { width: 100%; min-height: 96px; display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; padding: 18px 18px 16px; border: 0; color: #3a3f4a; font-size: 15px; text-align: left; cursor: pointer; }
+.month-item strong { align-self: flex-end; font-size: 17px; font-weight: 700; }
+.month-item strong span { margin-left: 4px; color: #7a808c; font-weight: 400; }
+.info-link-row { display: flex; justify-content: flex-end; padding: 14px 0 12px; }
+.text-link { border: 0; padding: 0; background: none; color: #3d4250; font-size: 14px; cursor: pointer; }
+.owned-card-list { display: grid; gap: 12px; }
+.owned-card { padding: 18px 18px 14px; }
+.owned-card-name { margin: 0; color: #2f3440; font-size: 15px; font-weight: 550; line-height: 1.45; }
+.owned-card-number { margin: 6px 0 0; color: #3d4250; font-size: 14px; }
+.owned-card-note { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid #e6e8ed; color: #555b66; font-size: 14px; }
+
+/* ----- 포인트 현금화 위임동의 ----- */
+.consent-scroll { padding-bottom: 100px; }
+.consent-intro { padding: 14px 20px 16px; background: #f4f5f7; color: #5f6570; font-size: 13px; line-height: 1.6; letter-spacing: -.03em; }
+.consent-intro p { margin: 0; }
+.consent-intro .consent-emphasis { margin-top: 10px; color: #3550c4; }
+.proxy-doc { padding: 22px 20px 6px; }
+.proxy-doc h2 { margin: 0 0 18px; color: #22262e; font-size: 19px; font-weight: 650; text-align: center; }
+.proxy-doc h3 { margin: 18px 0 14px; padding-bottom: 10px; border-bottom: 1.5px solid #3a3f4a; color: #2f3440; font-size: 15px; font-weight: 600; }
+.proxy-rows { gap: 6px; }
+.proxy-rows div { font-size: 14px; }
+.proxy-email-label { display: block; margin-top: 6px; color: #4d535e; font-size: 14px; }
+.required { margin-left: 1px; color: #e5383b; }
+.proxy-email { width: 100%; min-height: 46px; margin: 10px 0 14px; padding: 0 14px; border: 1px solid #dfe2e8; border-radius: 6px; background: #fff; color: #2f3440; font-size: 14.5px; }
+.proxy-email::placeholder { color: #9aa0ab; }
+.proxy-email:focus { border-color: #3f80f7; outline: none; }
+.proxy-statement { margin-top: 10px; padding: 22px 20px 10px; border-top: 1px solid var(--line); color: #2f3440; font-size: 15px; line-height: 1.6; letter-spacing: -.03em; text-align: center; }
+.proxy-statement p { margin: 0; }
+.proxy-statement .proxy-sign { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 18px; }
+.proxy-sign i { width: 1px; height: 14px; background: #9aa0ab; }
+.consent-footer { position: absolute; inset: auto 0 0; z-index: 3; padding: 14px 16px calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(rgba(255, 255, 255, 0), #fff 32%); }
+.consent-confirm { width: 100%; min-height: 52px; border: 0; border-radius: 10px; background: linear-gradient(110deg, #1e5ce6, #1a4fd6); color: #fff; font-size: 16px; font-weight: 650; cursor: pointer; transition: background .2s, color .2s; }
+.consent-confirm:disabled { background: #eceef1; color: #3a3f4a; cursor: default; }
+
+/* ----- 내 자동이체 한눈에 ----- */
+.autopay-content { padding-bottom: 30px; }
+.autopay-content[data-tab="transfer"], .autopay-content[data-tab="card"] { min-height: 100%; display: flex; flex-direction: column; }
+.autopay-date-row { display: flex; justify-content: flex-end; padding: 16px 20px 0; }
+.autopay-date-row.is-split { justify-content: space-between; }
+.autopay-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 20px 14px; border-bottom: 1px solid var(--line); }
+.mask-toggle { display: inline-flex; align-items: center; gap: 8px; border: 0; padding: 0; background: none; color: #4d535e; font-size: 13px; cursor: pointer; }
+.mask-toggle .switch { width: 40px; height: 23px; padding: 2.5px; transition: background .18s; }
+.mask-toggle .switch span { width: 18px; height: 18px; transition: transform .18s; }
+.mask-toggle .switch.is-on span { transform: translateX(17px); }
+.autopay-row { width: 100%; min-height: 66px; display: grid; grid-template-columns: 39px minmax(0, 1fr) auto 18px; align-items: center; gap: 10px; padding: 8px 20px; border: 0; border-bottom: 1px solid var(--line); background: #fff; text-align: left; cursor: pointer; transition: background .15s; }
+.autopay-bank { overflow: hidden; color: #3a3f4a; font-size: 15.5px; font-weight: 560; letter-spacing: -.03em; text-overflow: ellipsis; white-space: nowrap; }
+.autopay-bank em { margin-left: 8px; color: #2f56d6; font-style: normal; font-weight: 500; }
+.expand-chevron { width: 16px; height: 16px; fill: none; stroke: #6f7582; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.autopay-group.is-open .expand-chevron { transform: rotate(180deg); }
+.autopay-items { margin: 0; padding: 4px 20px 10px 69px; border-bottom: 1px solid var(--line); background: #fafbfc; list-style: none; }
+.autopay-items li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 10px 0; border-bottom: 1px dashed #e6e8ed; font-size: 14px; }
+.autopay-items li:last-child { border-bottom: 0; }
+.autopay-item-account { grid-column: 1; color: #858b97; font-size: 13px; }
+.autopay-item-amount { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.feature-notes.is-bottom { margin-top: auto; padding-bottom: 36px; }
+
+/* ----- 세금/공과금 납부 ----- */
+.feature-header .tax-history { width: calc(100% - 40px); margin: 14px 20px; }
+.tax-section { padding: 18px 20px 6px; border-bottom: 1px solid var(--line); }
+.tax-section-title { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; color: #2f3440; font-size: 16px; font-weight: 700; letter-spacing: -.03em; }
+.tax-icon svg { width: 24px; height: 24px; display: block; }
+.tax-items { margin: 0; padding: 0; list-style: none; }
+.tax-item { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; border: 0; padding: 0; background: none; color: #3a3f4a; font-size: 15px; letter-spacing: -.03em; text-align: left; cursor: pointer; }
+.tax-item .chevron { color: #9aa0ab; font-size: 24px; }
+.qr-pay-button { position: absolute; left: 50%; bottom: calc(var(--nav-height) + 16px); z-index: 30; display: inline-flex; align-items: center; gap: 6px; min-height: 46px; padding: 0 22px; border: 1.5px solid #3a4fa0; border-radius: 24px; background: rgba(255, 255, 255, .96); color: #2c3f8f; font-size: 15px; font-weight: 700; box-shadow: 0 6px 16px rgba(45, 59, 90, .14); transform: translateX(-50%); cursor: pointer; backdrop-filter: blur(10px); }
+.qr-pay-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+
+@media (max-width: 360px) {
+  .feature-desc br, .feature-desc.is-sub br { display: none; }
+  .pill-tabs { padding-inline: 16px; }
+  .card-company-row, .point-row, .autopay-row { padding-inline: 16px; }
+}

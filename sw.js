@@ -1,8 +1,11 @@
-const CACHE = "account-overview-demo-v10";
+const CACHE = "account-overview-demo-v11";
 const ASSETS = [
   "./index.html",
-  "./styles.css?v=10",
-  "./app.js?v=10",
+  "./styles.css?v=11",
+  "./app.js?v=11",
+  "./cards.js?v=11",
+  "./autopay.js?v=11",
+  "./tax.js?v=11",
   "./manifest.webmanifest",
   "./icon.svg",
   "./icon-192.png",
