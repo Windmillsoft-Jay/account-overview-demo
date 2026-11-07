@@ -19,9 +19,6 @@ const groups = {
       { id: "nh", name: "NH농협은행", mark: "NH", color: "#4f91dc", accounts: [
         { product: "NH주거래우대통장(비대면)", number: "3021772*****1", balance: 1098, canClose: true }
       ]},
-      { id: "gwangju", name: "광주은행", mark: "KJ", color: "#44a5d8", accounts: [
-        { product: "저축예금", number: "1121031*****6", balance: 0, canClose: false }
-      ]},
       { id: "kb", name: "국민은행", mark: "KB", color: "#a69161", accounts: [
         { product: "KB Wise통장", number: "05100104*****1", balance: 1, canClose: true },
         { product: "KB나라사랑우대통장", number: "93350200*****2", balance: 0, canClose: false },
@@ -42,12 +39,6 @@ const groups = {
         { product: "우리SUPER주거래통장", number: "1002564*****3", balance: 0, canClose: true },
         { product: "우리 주거래우대 저축예금", number: "1002448*****7", balance: 0, canClose: true },
         { product: "저축예금", number: "1002119*****4", balance: 0, canClose: true }
-      ]},
-      { id: "jeonbuk", name: "전북은행", mark: "JB", color: "#50a4d4", accounts: [
-        { product: "JB 주거래통장(저축)", number: "1021024*****0", balance: 0, canClose: false }
-      ]},
-      { id: "jeju", name: "제주은행", mark: "J", color: "#7163e9", accounts: [
-        { product: "보통예금 J간편한통장", number: "700100*****2", balance: 0, canClose: true }
       ]},
       { id: "kbank", name: "케이뱅크", mark: "K", color: "#8977e6", accounts: [
         { product: "플러스박스", number: "100513*****6", balance: 0, canClose: false },
@@ -71,9 +62,6 @@ const groups = {
         { product: "MG주거래우대통장", number: "9003289*****8", balance: 0, canClose: false },
         { product: "온라인자립예탁금", number: "9003304*****3", balance: 2000, canClose: false },
         { product: "정기예탁금", number: "9110712*****6", balance: 28000000, canClose: false }
-      ]},
-      { id: "creditunion", name: "신협", mark: "CU", color: "#416cc4", accounts: [
-        { product: "자립예탁금", number: "1318801*****8", balance: 13188, canClose: false }
       ]}
     ]
   },
